@@ -1,20 +1,25 @@
-﻿using ExampleService.Services;
+﻿using CalcService.Api;
+using CalcService.Math.Expression;
+using CalcService.Math.Expression.Builder;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ExampleService.Controllers
+namespace CalcService.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class CalcController(ICalcService calcService, ILogger<CalcController> logger)
+    public class CalcController(ILogger<CalcController> logger, IExpressionBuilder<decimal> builder, IResultFormatter<decimal> formatter)
     {
-        private readonly ICalcService _calcService = calcService;
         private readonly ILogger<CalcController> _logger = logger;
+        private readonly IExpressionBuilder<decimal> _builder = builder;
+        private readonly IResultFormatter<decimal> _formatter = formatter;
 
         [HttpGet(Name = "calc")]
-        public int Calc(int a, int b)
+        public IFormattedResult<decimal> CalcDecimal(string expressionString, string resultFormat = "simple")
         {
-            _logger.LogTrace($"Calc request: [{a} + {b}].");
-            return _calcService.calc(a, b);
+            _logger.LogTrace($"Calc request: [{expressionString}].");
+            IEvaulable<decimal> expression = _builder.Build(expressionString);
+            decimal result = expression.Eval();
+            return _formatter.FormatResult(result, resultFormat);
         }
     }
 }

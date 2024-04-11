@@ -1,7 +1,7 @@
+using CalcService.Api;
+using CalcService.Math.Operator;
 
-using ExampleService.Services;
-
-namespace ExampleService
+namespace CalcService
 {
     public class Program
     {
@@ -13,7 +13,9 @@ namespace ExampleService
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddHealthChecks();
-            builder.Services.AddScoped<ICalcService, CalcService>();
+            builder.Services.AddOperators();
+            builder.Services.AddParsers(builder.Configuration);
+            builder.Services.AddResultFormatters();
 
             var app = builder.Build();
             app.UseHealthChecks("/_health");
